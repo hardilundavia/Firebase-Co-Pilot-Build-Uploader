@@ -449,7 +449,7 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
                     }
                     appendLog(
                         if (detectedFirebasePlugin) "✅ Firebase App Distribution detected"
-                        else "ℹ️ Firebase App Distribution not detected — Firebase sections hidden"
+                        else "ℹ️ Firebase App Distribution not detected"
                     )
                     logScrollPane.isVisible = true
                 }
@@ -538,13 +538,14 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
         val account = parsedAccount ?: run {
             showError("Invalid Firebase service account."); return null
         }
-        val notes = noteArea.text.trim()
-        if (notes.isBlank()) { showError("Please enter release notes."); return null }
         val appId = appIdField.text.trim()
         if (appId.isBlank()) {
             showError("Please enter the Firebase App ID.\nFind it in Firebase Console → Project Settings → Your Apps.")
             return null
         }
+        val notes = noteArea.text.trim()
+        if (notes.isBlank()) { showError("Please enter release notes."); return null }
+
         settings.lastServiceAccountPath = saPath
         settings.lastAppId              = appId
         return DeployInput(

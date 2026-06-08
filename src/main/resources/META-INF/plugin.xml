@@ -26,40 +26,40 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow
-            id="Firebase Co-Pilot: Build Uploader"
-            anchor="right"
-            factoryClass="com.firebasebuilduploader.ui.FirebaseCoPilotToolWindowFactory"
-            icon="/icons/buildpilot_13.svg"
+                id="Firebase Co-Pilot: Build Uploader"
+                anchor="right"
+                factoryClass="com.firebasebuilduploader.ui.FirebaseCoPilotToolWindowFactory"
+                icon="/icons/40.png"
         />
 
         <applicationService
-            serviceInterface="com.firebasebuilduploader.services.FirebaseCoPilotSettingsService"
-            serviceImplementation="com.firebasebuilduploader.services.FirebaseCoPilotSettingsService"
+                serviceInterface="com.firebasebuilduploader.services.FirebaseCoPilotSettingsService"
+                serviceImplementation="com.firebasebuilduploader.services.FirebaseCoPilotSettingsService"
         />
 
         <projectService
-            serviceInterface="com.firebasebuilduploader.services.GradleFlavorDetectorService"
-            serviceImplementation="com.firebasebuilduploader.services.GradleFlavorDetectorService"
+                serviceInterface="com.firebasebuilduploader.services.GradleFlavorDetectorService"
+                serviceImplementation="com.firebasebuilduploader.services.GradleFlavorDetectorService"
         />
 
         <projectService
-            serviceInterface="com.firebasebuilduploader.services.BuildService"
-            serviceImplementation="com.firebasebuilduploader.services.BuildService"
+                serviceInterface="com.firebasebuilduploader.services.BuildService"
+                serviceImplementation="com.firebasebuilduploader.services.BuildService"
         />
 
         <projectService
-            serviceInterface="com.firebasebuilduploader.services.FirebaseDistributionService"
-            serviceImplementation="com.firebasebuilduploader.services.FirebaseDistributionService"
+                serviceInterface="com.firebasebuilduploader.services.FirebaseDistributionService"
+                serviceImplementation="com.firebasebuilduploader.services.FirebaseDistributionService"
         />
     </extensions>
 
     <actions>
         <action
-            id="FirebaseCoPilot.OpenPanel"
-            class="com.firebasebuilduploader.actions.OpenFirebaseCoPilotAction"
-            text="Firebase Co-Pilot: Build Uploader — Deploy to Firebase"
-            description="Open Firebase Co-Pilot: Build Uploader panel to build and distribute your app"
-            icon="/icons/buildpilot_13.svg"
+                id="FirebaseCoPilot.OpenPanel"
+                class="com.firebasebuilduploader.actions.OpenFirebaseCoPilotAction"
+                text="Firebase Co-Pilot: Build Uploader"
+                description="Open Firebase Co-Pilot: Build Uploader panel to build and distribute your app"
+                icon="/icons/13.png"
         >
             <add-to-group group-id="BuildMenu" anchor="last"/>
             <add-to-group group-id="MainToolBar" anchor="last"/>

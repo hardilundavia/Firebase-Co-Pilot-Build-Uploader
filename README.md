@@ -26,7 +26,7 @@
 **Prerequisites:** JDK 17, IntelliJ IDEA or Android Studio
 
 ```bash
-git clone https://github.com/your-org/FirebaseCoPilot.git
+git clone https://github.com/hardilundavia/Firebase-Co-Pilot-Build-Uploader.git
 cd FirebaseCoPilot
 ./gradlew buildPlugin
 ```
@@ -36,11 +36,18 @@ The plugin ZIP will be at:
 build/distributions/FirebaseCoPilot-1.0.0.zip
 ```
 
-**Install in Android Studio:**
+**Install in Android Studio From Plugin Zip:**
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…**
 2. Select the generated ZIP
 3. Restart Android Studio
 
+---
+
+**Install in Android Studio From Marketplace:**
+1. Open **Settings → Plugins → ⚙ → Marketplace**
+2. Search for the plugin Firebase Co-Pilot : Build Uploader
+3. Install the plugin 
+4. Restart Android Studio
 ---
 
 ## Setup
@@ -122,7 +129,8 @@ FirebaseCoPilot/
     │       └── FirebaseCoPilotToolWindowFactory.kt # Tool window registration
     └── resources/
         ├── META-INF/plugin.xml                # Plugin descriptor
-        └── icons/buildpilot_13.svg            # Plugin icon
+        ├── icons/40.png                       # tool windows icon (40x40)
+        └── icons/14.png                       # build tab icon (14x14)
 ```
 
 ---
