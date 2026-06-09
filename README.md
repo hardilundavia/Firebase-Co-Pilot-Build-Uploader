@@ -1,4 +1,4 @@
-# 🚀 Firebase Co-Pilot: App Uploader — Android Studio Plugin
+# 🚀 Firebase Co-Pilot: Build Uploader — Android Studio Plugin
 
 > Build & distribute your Android app to Firebase App Distribution directly from Android Studio — with full flavor support, release notes, and one-click deployment.
 
@@ -6,15 +6,15 @@
 
 ## Features
 
-| Feature | Details |
-|---|---|
+| Feature | Details                                                             |
+|---|---------------------------------------------------------------------|
 | **Flavor Detection** | Auto-scans `build.gradle` / `build.gradle.kts` for `productFlavors` |
-| **Build Type Selection** | Debug / Release (or any custom build type) |
-| **Flavor + Build Type Combos** | e.g. `uatDebug`, `prodRelease` |
-| **Firebase Auth** | Service Account JSON — no manual token setup |
-| **Release Notes** | Save and reuse notes, or type custom ones |
-| **One-click Deploy** | Build → upload → done |
-| **Build Log** | Live output in the tool window |
+| **Build Type Selection** | Debug / Release (or any custom build type)                          |
+| **Flavor + Build Type Combos** | e.g. `uatDebug`, `prodRelease`                                      |
+| **Firebase Auth** | Service Account JSON — no manual token setup                        |
+| **Release Notes** | Select templates and type your custom notes                         |
+| **One-click Deploy** | Build → upload → done                                               |
+| **Build Log** | Live output in the tool window                                      |
 | **Persistent Settings** | Remembers your last App ID, service account path, and release notes |
 
 ---
@@ -89,8 +89,8 @@ In [Google Cloud IAM](https://console.cloud.google.com/iam-admin/iam), grant the
 
 ## Usage
 
-1. Open **Build → Firebase Co-Pilot: App Uploader** (or press `Ctrl+Shift+F`)
-2. The **Firebase Co-Pilot: App Uploader** panel opens on the right sidebar
+1. Open **Build → Firebase Co-Pilot: Build Uploader** (or press `Alt+Shift+B`)
+2. The **Firebase Co-Pilot: Build Uploader** panel opens on the right sidebar
 3. **If your project has flavors**, select flavor + build type
 4. **If simple project**, just select build type (Debug / Release)
 5. Paste your **Firebase App ID**

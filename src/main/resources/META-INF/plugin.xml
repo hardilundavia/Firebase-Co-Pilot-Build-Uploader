@@ -59,11 +59,11 @@
                 class="com.firebasebuilduploader.actions.OpenFirebaseCoPilotAction"
                 text="Firebase Co-Pilot: Build Uploader"
                 description="Open Firebase Co-Pilot: Build Uploader panel to build and distribute your app"
-                icon="/icons/13.png"
+                icon="/icons/14.png"
         >
             <add-to-group group-id="BuildMenu" anchor="last"/>
             <add-to-group group-id="MainToolBar" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift B"/>
         </action>
     </actions>
 </idea-plugin>
