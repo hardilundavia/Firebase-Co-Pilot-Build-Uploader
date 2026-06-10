@@ -181,7 +181,3 @@ PRs welcome! Please follow:
 - Update `plugin.xml` version on changes
 
 ---
-
-## License
-
-MIT License — see [LICENSE](LICENSE)
