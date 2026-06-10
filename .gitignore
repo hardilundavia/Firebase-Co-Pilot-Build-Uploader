@@ -1,0 +1,10 @@
+.gradle/
+build/
+.idea/
+*.iml
+local.properties
+
+# Never commit service account credentials
+*service-account*.json
+*firebase-adminsdk*.json
+*.keystore
