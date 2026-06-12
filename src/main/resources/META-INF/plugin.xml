@@ -51,6 +51,9 @@
                 serviceInterface="com.firebasebuilduploader.services.FirebaseDistributionService"
                 serviceImplementation="com.firebasebuilduploader.services.FirebaseDistributionService"
         />
+
+        <projectService
+                serviceImplementation="com.firebasebuilduploader.services.SigningConfigService"/>
     </extensions>
 
     <actions>
