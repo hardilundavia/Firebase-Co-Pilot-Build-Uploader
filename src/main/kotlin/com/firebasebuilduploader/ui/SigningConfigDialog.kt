@@ -6,6 +6,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
@@ -18,7 +19,7 @@ import javax.swing.event.DocumentListener
  * Main signing config dialog — "Use existing keystore" mode only.
  *
  * "Create New Keystore…" opens [CreateKeystoreDialog] as a sub-dialog.
- * On success it auto-fills ALL four fields (path, passwords, alias) here,
+ * On success, it autofills ALL four fields (path, passwords, alias) here,
  * then THIS dialog's OK triggers the actual Gradle injection.
  */
 class SigningConfigDialog(private val project: Project) : DialogWrapper(project) {
@@ -41,10 +42,12 @@ class SigningConfigDialog(private val project: Project) : DialogWrapper(project)
         init()
 
         keystorePathField.addBrowseFolderListener(
-            "Select Keystore File",
-            "Choose a .jks, .keystore, or .p12 file",
-            project,
-            FileChooserDescriptorFactory.createSingleFileDescriptor()
+            TextBrowseFolderListener(
+                FileChooserDescriptorFactory.createSingleFileDescriptor()
+                    .withTitle("Select Keystore File")
+                    .withDescription("Choose a .jks, .keystore, or .p12 file"),
+                project
+            )
         )
 
         // "Same password" checkbox wiring
@@ -97,7 +100,7 @@ class SigningConfigDialog(private val project: Project) : DialogWrapper(project)
         val dlg = CreateKeystoreDialog(project)
         if (dlg.showAndGet()) {
             val data = dlg.getResult()
-            // Auto-fill ALL four fields — mirrors Android Studio behaviour
+            // Autofill ALL four fields — mirrors Android Studio behavior
             keystorePathField.text          = data.keystorePath
             keystorePasswordField.text      = data.keystorePassword
             keyAliasField.text              = data.keyAlias

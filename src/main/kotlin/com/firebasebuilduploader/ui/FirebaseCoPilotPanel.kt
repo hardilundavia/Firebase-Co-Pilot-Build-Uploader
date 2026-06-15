@@ -29,9 +29,9 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListener
-import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListenerAdapter
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType
 import com.intellij.openapi.externalSystem.service.notification.ExternalSystemProgressNotificationManager
+import com.intellij.openapi.ui.TextBrowseFolderListener
 import org.jetbrains.plugins.gradle.util.GradleConstants
 
 class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()) {
@@ -384,10 +384,12 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
         val p = JPanel(GridBagLayout()).also { it.isOpaque = false }
 
         saField.addBrowseFolderListener(
-            "Select Firebase Service Account JSON",
-            "Choose the service account JSON from Firebase Console → Project Settings → Service Accounts",
-            project,
-            FileChooserDescriptorFactory.createSingleFileDescriptor("json")
+            TextBrowseFolderListener(
+                FileChooserDescriptorFactory.createSingleFileDescriptor("json")
+                    .withTitle("Select Firebase Service Account JSON")
+                    .withDescription("Choose The Service account JSON from Firebase Console → Project Settings → Service Accounts"),
+                project
+            )
         )
         saField.textField.font = Font("SansSerif", Font.PLAIN, 12)
         p.add(saField, GridBagConstraints().apply {

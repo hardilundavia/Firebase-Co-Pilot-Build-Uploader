@@ -3,6 +3,8 @@ package com.firebasebuilduploader.services
 import com.firebasebuilduploader.model.SigningConfigData
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
+import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.gradle.util.GradleConstants
@@ -357,12 +359,10 @@ class SigningConfigService(private val project: Project) {
 
     fun triggerGradleSync() {
         log.info("FirebaseCoPilot: Triggering Gradle sync")
-        ExternalSystemUtil.refreshProject(
-            project,
-            GradleConstants.SYSTEM_ID,
-            project.basePath ?: return,
-            false,
-            com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode.IN_BACKGROUND_ASYNC
+        ExternalSystemUtil.refreshProjects(
+            ImportSpecBuilder(project, GradleConstants.SYSTEM_ID)
+                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+                .build()
         )
     }
 }
