@@ -735,9 +735,8 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
                     appId                  = input.appId
                 )
 
-                // FIX 3: Pass hasFirebasePlugin here too
                 val apk = withContext(Dispatchers.IO) {
-                    buildSvc.assembleBuildForDeploy(config, hasFirebasePlugin) { appendLog(it) }
+                    buildSvc.assembleBuild(config, hasFirebasePlugin, forDeploy = true) { appendLog(it) }
                 } ?: throw RuntimeException("APK not found after build — check Build Output tab.")
 
                 val displayName = apk.name.replace("-unsigned", "")
