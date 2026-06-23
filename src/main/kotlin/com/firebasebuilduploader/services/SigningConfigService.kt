@@ -358,11 +358,12 @@ class SigningConfigService(private val project: Project) {
     // ── Gradle sync ─────────────────────────────────────────────────────────
 
     fun triggerGradleSync() {
+        val projectPath = project.basePath ?: return
         log.info("FirebaseCoPilot: Triggering Gradle sync")
-        ExternalSystemUtil.refreshProjects(
+        ExternalSystemUtil.refreshProject(
+            projectPath,
             ImportSpecBuilder(project, GradleConstants.SYSTEM_ID)
                 .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
-                .build()
         )
     }
 }

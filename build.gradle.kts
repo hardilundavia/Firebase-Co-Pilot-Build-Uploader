@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.firebasebuilduploader"
-version = "2.0.0"
+version = "2.0.1"
 
 repositories {
     mavenCentral()
@@ -18,19 +18,22 @@ configurations.runtimeClasspath {
 }
 dependencies {
     intellijPlatform {
-        // Target Android Studio Ladybug | 2024.2.1 — change to match your installed version
-        androidStudio("2024.2.1.11")
+        // Target Android Studio 2025.1 — compile SDK for current Platform APIs
+        androidStudio("2025.1.3.7")
 
         // Required bundled plugins
         bundledPlugin("org.jetbrains.android")
         bundledPlugin("org.jetbrains.plugins.gradle")
         bundledPlugin("com.intellij.java")
-
-        instrumentationTools()
     }
 
     // Firebase / Google Auth
-    implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
+    implementation(platform("com.google.auth:google-auth-library-bom:1.37.1"))
+    implementation("com.google.auth:google-auth-library-oauth2-http")
+    // Override transitive commons-codec to fix WS-2019-0379 (versions < 1.13)
+    implementation("commons-codec:commons-codec:1.21.0")
+    // Override transitive Guava to fix CVE-2023-2976 (versions < 32.0.1)
+    implementation("com.google.guava:guava:32.1.3-jre")
 
     // HTTP client for Firebase Distribution API
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

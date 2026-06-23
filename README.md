@@ -5,6 +5,17 @@
 
 ---
 
+## What's New in v2.0.1 🔧
+
+| # | Change |
+|---|--------|
+| ✅ | **JetBrains Marketplace compatibility** — Removed deprecated IntelliJ Platform APIs (file browse dialogs, Gradle sync listener, project refresh) flagged on Android Studio 2025.x / 2026.x |
+| 🛡️ | **Security dependency updates** — Upgraded Google Auth Library (BOM 1.37.1); pinned Guava (CVE-2023-2976) and Commons Codec (WS-2019-0379) to safe versions |
+| 🏗️ | **Forward-compatible build** — Compile SDK updated to Android Studio 2025.1 Platform APIs |
+| ℹ️ | **No user-facing behaviour changes** — All v2.0.0 features work exactly as before |
+
+---
+
 ## What's New in v2.0 🎉
 
 | # | Feature |
@@ -72,7 +83,7 @@ cd FirebaseCoPilot
 
 The plugin ZIP will be at:
 ```
-build/distributions/FirebaseCoPilot-2.0.0.zip
+build/distributions/FirebaseCoPilot-2.0.1.zip
 ```
 
 **Install from ZIP:**

@@ -6,8 +6,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.util.ui.SwingHelper
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import java.awt.*
@@ -41,13 +41,12 @@ class SigningConfigDialog(private val project: Project) : DialogWrapper(project)
         setOKButtonText("OK")
         init()
 
-        keystorePathField.addBrowseFolderListener(
-            TextBrowseFolderListener(
-                FileChooserDescriptorFactory.createSingleFileDescriptor()
-                    .withTitle("Select Keystore File")
-                    .withDescription("Choose a .jks, .keystore, or .p12 file"),
-                project
-            )
+        SwingHelper.installFileCompletionAndBrowseDialog(
+            project,
+            keystorePathField,
+            FileChooserDescriptorFactory.singleFile()
+                .withTitle("Select Keystore File")
+                .withDescription("Choose a .jks, .keystore, or .p12 file")
         )
 
         // "Same password" checkbox wiring
