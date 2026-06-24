@@ -21,29 +21,21 @@ class BuildService(private val project: Project) {
     private val log = thisLogger()
 
     /**
-     * Assembles APK only.
+     * Assembles an APK for the given [config].
      *
-     * FIX 3: Only passes "-x appDistributionUploadXxx" when the Firebase App
-     * Distribution plugin is actually present in the project. Passing -x for a
-     * task that doesn't exist causes Gradle to abort with "Task not found".
+     * When [hasFirebasePlugin] is true, the Firebase App Distribution Gradle
+     * task is excluded via `-x` to prevent double-uploads. Passing `-x` for a
+     * task that does not exist causes Gradle to abort with "Task not found", so
+     * the flag is only applied when the plugin is confirmed present.
+     *
+     * Use [forDeploy] = true when the APK will be uploaded immediately after
+     * the build (currently identical behaviour, kept as a semantic hint and for
+     * future differentiation such as notarisation or signing checks).
      */
     suspend fun assembleBuild(
-        config:             BuildConfiguration,
-        hasFirebasePlugin:  Boolean = false,
-        onOutput:           (String) -> Unit = {}
-    ): File? = runGradleTask(
-        config    = config,
-        extraArgs = if (hasFirebasePlugin) "-x ${config.firebaseUploadTaskName()}" else "",
-        onOutput  = onOutput
-    )
-
-    /**
-     * Assembles for deploy. Same Firebase-task exclusion logic — only exclude
-     * the Gradle plugin task when it actually exists, to prevent double-upload.
-     */
-    suspend fun assembleBuildForDeploy(
         config:            BuildConfiguration,
         hasFirebasePlugin: Boolean = false,
+        forDeploy:         Boolean = false,
         onOutput:          (String) -> Unit = {}
     ): File? = runGradleTask(
         config    = config,
@@ -72,7 +64,9 @@ class BuildService(private val project: Project) {
         onOutput("▶  Running :app:$taskName…")
         log.info("FirebaseCoPilot: Executing :app:$taskName  flavor=${config.flavor}  buildType=${config.buildType}  extraArgs='$extraArgs'")
 
-        val scriptParams = listOf("--info", extraArgs).filter { it.isNotBlank() }.joinToString(" ")
+        val scriptParams = listOf("--info", extraArgs)
+            .filter { it.isNotBlank() }
+            .joinToString(" ")
 
         val settings = ExternalSystemTaskExecutionSettings().apply {
             externalSystemIdString = GradleConstants.SYSTEM_ID.id
@@ -137,7 +131,7 @@ class BuildService(private val project: Project) {
             }
         }
 
-        // 2. Walk ONLY the correct flavor/buildType subdirectory — never pick
+        // 2. Walk only the correct flavor/buildType subdirectory — never pick
         //    a stale APK from a different flavor (e.g. prod/debug for uat/release).
         val scopedDir = if (flavor != null) {
             File(projectPath, "$mod/build/outputs/apk/$flavor/$buildType")

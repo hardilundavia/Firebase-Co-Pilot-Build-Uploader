@@ -27,8 +27,17 @@ import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListener
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListenerAdapter
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType
+import com.intellij.openapi.externalSystem.service.notification.ExternalSystemProgressNotificationManager
+import org.jetbrains.plugins.gradle.util.GradleConstants
 
 class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()) {
+
+    private val signingConfigSvc = project.service<SigningConfigService>()
+    private var hasReleaseSigningConfig = false
 
     // ── Services ───────────────────────────────────────────────────────────
     private val flavorDetector = project.service<GradleFlavorDetectorService>()
@@ -103,6 +112,36 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
         preferredSize = Dimension(0, 38)
     }
 
+    private val signingWarningLabel = JLabel(
+        "<html><a href=''>⚠ No signing configuration found for 'release'. Click to configure.</a></html>"
+    ).apply {
+        foreground = JBColor(Color(0xB36A00), Color(0xE0A030))
+        font = Font(font.name, Font.PLAIN, 11)
+        cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+        isVisible = false
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                openSigningConfigDialog()
+            }
+        })
+    }
+
+    private val syncListener = object : ExternalSystemTaskNotificationListener {
+        override fun onSuccess(id: ExternalSystemTaskId) {
+            if (id.type != ExternalSystemTaskType.RESOLVE_PROJECT) return
+            if (id.projectSystemId != GradleConstants.SYSTEM_ID) return
+
+            ApplicationManager.getApplication().invokeLater {
+                // Reuses the existing refresh-button logic: re-detects flavors/build
+                // types via flavorDetector.detectProjectConfig() and repopulates
+                // flavorCombo / buildTypeCombo while preserving the selection.
+                loadProject()
+                refreshSigningWarning()
+                statusLabel.text = "Project synced — ready"
+            }
+        }
+    }
+
     // FIX 1 & 2: Keep a reference to the footer button panel so we can
     // switch its layout when deployBtn visibility changes.
     private lateinit var buttonPanel: JPanel
@@ -123,10 +162,12 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     )
 
     init {
+        ExternalSystemProgressNotificationManager.getInstance().addNotificationListener(syncListener)
         buildUI()
         loadProject()
         restoreSettings()
         wireEvents()
+        refreshSigningWarning()
     }
 
     // =========================================================================
@@ -270,12 +311,71 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
         flavorRowPanel.isVisible = false
         p.add(flavorRowPanel, GridBagConstraints().apply {
             gridx = 0; gridy = 0; weightx = 1.0; fill = GridBagConstraints.HORIZONTAL
-            insets = Insets(0,0,6,0)
+            insets = Insets(0, 0, 6, 0)
         })
         p.add(makeFormRow("Build Type", buildTypeCombo), GridBagConstraints().apply {
             gridx = 0; gridy = 1; weightx = 1.0; fill = GridBagConstraints.HORIZONTAL
         })
+        // NEW: contextual warning, hidden by default
+        p.add(signingWarningLabel, GridBagConstraints().apply {
+            gridx = 0; gridy = 2; weightx = 1.0; fill = GridBagConstraints.HORIZONTAL
+            insets = Insets(4, 4, 0, 0)
+        })
+
+        // NEW: re-check signing status whenever the build type changes
+        buildTypeCombo.addActionListener { refreshSigningWarning() }
+
         return p
+    }
+
+    private fun refreshSigningWarning() {
+        val isRelease = (buildTypeCombo.selectedItem as? String) == "release"
+        if (!isRelease) {
+            signingWarningLabel.isVisible = false
+            return
+        }
+        scope.launch {
+            hasReleaseSigningConfig = withContext(Dispatchers.IO) {
+                signingConfigSvc.hasReleaseSigningConfig()
+            }
+            signingWarningLabel.isVisible = !hasReleaseSigningConfig
+        }
+    }
+
+    private fun openSigningConfigDialog(): Boolean {
+        val dialog = SigningConfigDialog(project)
+        val ok = dialog.showAndGet()
+        if (!ok) return hasReleaseSigningConfig
+
+        val data = dialog.toSigningConfigData()
+        statusLabel.text = "Applying signing configuration…"
+
+        val error = signingConfigSvc.applySigningConfig(data) {
+            // onSyncStarted callback — UI feedback that sync has begun
+            statusLabel.text = "Signing config applied — syncing Gradle…"
+        }
+
+        return if (error != null) {
+            JOptionPane.showMessageDialog(
+                this, error, "Signing Configuration Error", JOptionPane.ERROR_MESSAGE
+            )
+            false
+        } else {
+            hasReleaseSigningConfig = true
+            signingWarningLabel.isVisible = false
+            true
+        }
+    }
+
+    /**
+     * Wraps deploy/build entry points so that selecting "release" without a
+     * signing config force-opens the dialog first. Returns true if the caller
+     * should proceed, false if the user needs to resolve signing first.
+     */
+    private fun ensureSigningConfigBeforeProceeding(): Boolean {
+        val isRelease = (buildTypeCombo.selectedItem as? String) == "release"
+        if (!isRelease || hasReleaseSigningConfig) return true
+        return openSigningConfigDialog()
     }
 
     // ── Step 2: Firebase ──────────────────────────────────────────────────
@@ -561,6 +661,7 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     // =========================================================================
 
     private fun startBuildOnly() {
+        if (!ensureSigningConfigBeforeProceeding()) return
         logArea.text = ""; linkPanel.isVisible = false; logScrollPane.isVisible = true
         val input = validateBuildInput()
 
@@ -607,6 +708,7 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     // =========================================================================
 
     private fun startBuildAndDeploy() {
+        if (!ensureSigningConfigBeforeProceeding()) return
         logArea.text = ""; linkPanel.isVisible = false; logScrollPane.isVisible = true
         val input = validateDeployInput() ?: return
 
@@ -633,9 +735,8 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
                     appId                  = input.appId
                 )
 
-                // FIX 3: Pass hasFirebasePlugin here too
                 val apk = withContext(Dispatchers.IO) {
-                    buildSvc.assembleBuildForDeploy(config, hasFirebasePlugin) { appendLog(it) }
+                    buildSvc.assembleBuild(config, hasFirebasePlugin, forDeploy = true) { appendLog(it) }
                 } ?: throw RuntimeException("APK not found after build — check Build Output tab.")
 
                 val displayName = apk.name.replace("-unsigned", "")
@@ -766,7 +867,10 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     private fun showError(msg: String) =
         JOptionPane.showMessageDialog(this, msg, "Firebase Co-Pilot: Build Uploader", JOptionPane.WARNING_MESSAGE)
 
-    fun dispose() = scope.cancel()
+    fun dispose() {
+        scope.cancel()
+        ExternalSystemProgressNotificationManager.getInstance().removeNotificationListener(syncListener)
+    }
 
     // =========================================================================
     // Layout utilities

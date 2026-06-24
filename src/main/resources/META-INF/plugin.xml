@@ -2,22 +2,108 @@
     <id>com.firebasebuilduploader.android</id>
     <name>Firebase Co-Pilot Build Uploader</name>
     <vendor email="hardil.undavia@gmail.com">Hardil Undavia</vendor>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 
     <description><![CDATA[
-        <b>Firebase Co-Pilot: Build Uploader</b> — Smart Firebase Distribution for Android Developers<br/><br/>
-        Streamline your Android build and distribution workflow directly from Android Studio:<br/>
+        <b>Firebase Co-Pilot: Build Uploader</b> — The all-in-one Firebase App Distribution tool for Android developers.<br/><br/>
+
+        Build, sign, and distribute your Android app to Firebase App Distribution without ever leaving Android Studio.
+        The plugin handles everything: flavor detection, APK assembly, release signing, upload, release notes, and
+        tester-group distribution — all from a single tool window.<br/><br/>
+
+        <b>✦ Core Features</b>
         <ul>
-            <li>Auto-detects project flavors (UAT, Prod, etc.)</li>
-            <li>Select different build type with flavor support</li>
-            <li>Upload APK directly to Firebase App Distribution</li>
-            <li>Add release notes before every deployment</li>
-            <li>Service account JSON authentication — no manual token setup</li>
+            <li><b>Auto Flavor Detection</b> — Scans <code>build.gradle</code> / <code>build.gradle.kts</code> for
+                <code>productFlavors</code> (both Groovy and KTS DSLs). Falls back to a
+                <code>firebasecopilot-flavors.json</code> file when Gradle parsing is not possible.</li>
+            <li><b>Build Type Selection</b> — Supports Debug, Release, and any custom build types defined in your project.</li>
+            <li><b>One-Click Build &amp; Deploy</b> — Runs <code>./gradlew :app:assembleFLAVORBUILDTYPE</code>, locates
+                the generated APK, and uploads it to Firebase — all in a single click.</li>
+            <li><b>Build Only Mode</b> — Assemble an APK locally without uploading.</li>
+            <li><b>Firebase Auth via Service Account</b> — Authenticates using a Service Account JSON file.
+                No manual token management or CLI setup required.</li>
+            <li><b>Release Notes</b> — Choose from saved templates or write custom notes. Notes are attached
+                to the Firebase release automatically.</li>
+            <li><b>Tester Group Distribution</b> — Reads <code>groups</code> from the
+                <code>firebaseAppDistribution { }</code> block in your build.gradle and distributes the
+                release to those groups automatically after upload.</li>
+            <li><b>Live Build Log</b> — Streams Gradle output directly in the tool window panel.</li>
+            <li><b>Persistent Settings</b> — Remembers your last App ID, service account path, and up to
+                20 saved release note templates across IDE restarts.</li>
+            <li><b>Recent Deployments History</b> — Tracks the last 10 deployments with timestamps, flavors,
+                build types, and Firebase Console links.</li>
+            <li><b>Auto Project Sync</b> — Re-scans flavors and build types automatically whenever Gradle
+                syncs, keeping the UI always up to date.</li>
+        </ul>
+
+        <b>✦ Signing Configuration (New in v2.0)</b>
+        <ul>
+            <li><b>Release Signing Warning</b> — Detects missing signing config when "release" build type is
+                selected and prompts you to configure it before building.</li>
+            <li><b>Signing Config Wizard</b> — Generate a signingConfigs block and inject it into
+                <code>build.gradle</code> / <code>build.gradle.kts</code> automatically.</li>
+            <li><b>Create New Keystore</b> — Generate a brand-new <code>.jks</code> / <code>.p12</code>
+                keystore via <code>keytool</code> with a guided form (alias, passwords, certificate DN,
+                validity period) — no terminal required.</li>
+            <li><b>Use Existing Keystore</b> — Point to an existing keystore file and the plugin writes
+                <code>keystore.properties</code> and injects the Gradle signing block for you.</li>
+            <li><b>Secure by Default</b> — Credentials are stored in <code>keystore.properties</code>
+                (never hardcoded in build.gradle) and the plugin automatically adds keystore files and
+                property files to <code>.gitignore</code>.</li>
+            <li><b>Supports Groovy &amp; KTS</b> — Signing config injection works for both
+                <code>build.gradle</code> (Groovy) and <code>build.gradle.kts</code> (Kotlin Script).</li>
+        </ul>
+
+        <b>✦ How to open</b><br/>
+        <i>Build → Firebase Co-Pilot: Build Uploader</i> or press <code>Alt+Shift+B</code>.
+        The panel docks to the right sidebar.<br/><br/>
+
+        <b>✦ Requirements</b>
+        <ul>
+            <li>Android Studio (Hedgehog or later recommended)</li>
+            <li>A Firebase project with App Distribution enabled</li>
+            <li>A Service Account JSON with the <i>Firebase App Distribution Admin</i> IAM role</li>
         </ul>
     ]]></description>
 
     <change-notes><![CDATA[
-        <b>1.0.0</b> — Initial release with full Firebase App Distribution support.
+        <b>2.0.0</b> — Signed APK &amp; Signing Configuration Support<br/>
+        <ul>
+            <li><b>New: Release Signing Wizard</b> — Detects missing signing config when the "release" build
+                type is selected and shows a clickable inline warning. Opens a guided dialog to apply signing
+                configuration directly from the panel.</li>
+            <li><b>New: Create Keystore dialog</b> — Generate a new <code>.jks</code> / <code>.p12</code>
+                keystore via keytool without leaving Android Studio. Supports full certificate DN, custom
+                alias, separate key/store passwords, and configurable validity period.</li>
+            <li><b>New: Gradle signing config injection</b> — Automatically writes
+                <code>keystore.properties</code> and injects a <code>signingConfigs</code> block into
+                <code>build.gradle</code> or <code>build.gradle.kts</code>. Safe to re-apply — replaces
+                any previously injected block.</li>
+            <li><b>New: Auto .gitignore update</b> — Keystore files and property files are added to
+                <code>.gitignore</code> automatically to prevent accidental credential commits.</li>
+            <li><b>New: Tester group auto-distribution</b> — Reads <code>groups</code> from the
+                <code>firebaseAppDistribution { }</code> block and distributes releases to those groups
+                after every upload.</li>
+            <li><b>Fix: Duplicate APK from wrong flavor</b> — APK discovery is now scoped strictly to the
+                selected flavor + build type directory; stale APKs from other flavors are never used.</li>
+            <li><b>Fix: Gradle abort on missing Firebase task</b> — The <code>-x appDistributionUpload</code>
+                exclusion flag is now only passed when the Firebase Gradle plugin is actually present,
+                preventing "Task not found" errors on plain projects.</li>
+            <li><b>Fix: Correct Firebase Console URL</b> — The console link now uses the URL returned
+                directly by the Firebase API instead of a reconstructed one.</li>
+            <li><b>Improvement: Auto-refresh on Gradle sync</b> — Flavor and build type combos update
+                automatically after every Gradle sync without requiring a manual refresh.</li>
+        </ul>
+
+        <b>1.0.0</b> — Initial release<br/>
+        <ul>
+            <li>Auto flavor detection from build.gradle / build.gradle.kts</li>
+            <li>Build type selection with flavor combos</li>
+            <li>One-click Build &amp; Deploy to Firebase App Distribution</li>
+            <li>Service Account JSON authentication</li>
+            <li>Release notes templates with persistent history</li>
+            <li>Live Gradle build log in the tool window</li>
+        </ul>
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
@@ -51,6 +137,10 @@
                 serviceInterface="com.firebasebuilduploader.services.FirebaseDistributionService"
                 serviceImplementation="com.firebasebuilduploader.services.FirebaseDistributionService"
         />
+
+        <projectService
+                serviceImplementation="com.firebasebuilduploader.services.SigningConfigService"
+        />
     </extensions>
 
     <actions>
@@ -58,7 +148,7 @@
                 id="FirebaseCoPilot.OpenPanel"
                 class="com.firebasebuilduploader.actions.OpenFirebaseCoPilotAction"
                 text="Firebase Co-Pilot: Build Uploader"
-                description="Open Firebase Co-Pilot: Build Uploader panel to build and distribute your app"
+                description="Open Firebase Co-Pilot: Build Uploader panel to build, sign, and distribute your Android app"
                 icon="/icons/14.png"
         >
             <add-to-group group-id="BuildMenu" anchor="last"/>
