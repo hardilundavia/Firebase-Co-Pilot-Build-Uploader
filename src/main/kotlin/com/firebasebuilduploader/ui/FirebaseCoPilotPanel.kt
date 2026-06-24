@@ -13,6 +13,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.SwingHelper
 import com.intellij.util.ui.UIUtil
 import kotlinx.coroutines.*
 import java.awt.*
@@ -29,7 +30,6 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListener
-import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListenerAdapter
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType
 import com.intellij.openapi.externalSystem.service.notification.ExternalSystemProgressNotificationManager
 import org.jetbrains.plugins.gradle.util.GradleConstants
@@ -127,7 +127,7 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     }
 
     private val syncListener = object : ExternalSystemTaskNotificationListener {
-        override fun onSuccess(id: ExternalSystemTaskId) {
+        override fun onSuccess(projectPath: String, id: ExternalSystemTaskId) {
             if (id.type != ExternalSystemTaskType.RESOLVE_PROJECT) return
             if (id.projectSystemId != GradleConstants.SYSTEM_ID) return
 
@@ -383,11 +383,13 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     private fun makeFirebaseContent(): JPanel {
         val p = JPanel(GridBagLayout()).also { it.isOpaque = false }
 
-        saField.addBrowseFolderListener(
-            "Select Firebase Service Account JSON",
-            "Choose the service account JSON from Firebase Console → Project Settings → Service Accounts",
+        SwingHelper.installFileCompletionAndBrowseDialog(
             project,
-            FileChooserDescriptorFactory.createSingleFileDescriptor("json")
+            saField,
+            FileChooserDescriptorFactory.singleFile()
+                .withExtensionFilter("json")
+                .withTitle("Select Firebase Service Account JSON")
+                .withDescription("Choose The Service account JSON from Firebase Console → Project Settings → Service Accounts")
         )
         saField.textField.font = Font("SansSerif", Font.PLAIN, 12)
         p.add(saField, GridBagConstraints().apply {

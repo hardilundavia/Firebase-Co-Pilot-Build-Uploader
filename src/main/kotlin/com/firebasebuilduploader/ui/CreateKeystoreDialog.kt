@@ -7,6 +7,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.util.ui.SwingHelper
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import java.awt.*
@@ -54,11 +55,12 @@ class CreateKeystoreDialog(private val project: Project) : DialogWrapper(project
 
         project.basePath?.let { keystorePathField.text = "$it/app/release.jks" }
 
-        keystorePathField.addBrowseFolderListener(
-            "Choose Keystore Save Location",
-            "The new .jks file will be written here",
+        SwingHelper.installFileCompletionAndBrowseDialog(
             project,
-            FileChooserDescriptorFactory.createSingleFileDescriptor()
+            keystorePathField,
+            FileChooserDescriptorFactory.singleFile()
+                .withTitle("Choose Keystore Save Location")
+                .withDescription("The new .jks file will be written here")
         )
 
         // "Same password" checkbox wiring —————————————————————————————————————
