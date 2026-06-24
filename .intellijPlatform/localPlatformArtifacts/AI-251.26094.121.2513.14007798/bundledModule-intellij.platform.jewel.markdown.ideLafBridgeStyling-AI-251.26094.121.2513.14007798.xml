@@ -1,0 +1,17 @@
+<ivy-module version="2.0">
+  <info organisation="bundledModule" module="intellij.platform.jewel.markdown.ideLafBridgeStyling" revision="AI-251.26094.121.2513.14007798"/>
+  <configurations>
+    <conf name="default" visibility="public"/>
+  </configurations>
+  <publications>
+    <artifact name="intellij.platform.jewel.markdown.ideLafBridgeStyling" ext="jar" conf="default" url="lib/modules"/>
+  </publications>
+  <dependencies>
+    <dependency org="bundledModule" name="intellij.platform.jewel.foundation" rev="AI-251.26094.121.2513.14007798"/>
+    <dependency org="bundledModule" name="intellij.platform.jewel.ui" rev="AI-251.26094.121.2513.14007798"/>
+    <dependency org="bundledModule" name="intellij.platform.jewel.ideLafBridge" rev="AI-251.26094.121.2513.14007798"/>
+    <dependency org="bundledModule" name="intellij.platform.jewel.markdown.core" rev="AI-251.26094.121.2513.14007798"/>
+    <dependency org="bundledModule" name="intellij.platform.jewel.markdown.extensions.gfmAlerts" rev="AI-251.26094.121.2513.14007798"/>
+    <dependency org="bundledModule" name="intellij.platform.jewel.markdown.extensions.gfmTables" rev="AI-251.26094.121.2513.14007798"/>
+  </dependencies>
+</ivy-module>
