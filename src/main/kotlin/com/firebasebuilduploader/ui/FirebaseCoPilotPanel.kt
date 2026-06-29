@@ -27,6 +27,8 @@ import java.util.Date
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
+import javax.swing.event.AncestorEvent
+import javax.swing.event.AncestorListener
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
@@ -169,6 +171,11 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
         restoreSettings()
         wireEvents()
         refreshSigningWarning()
+        addAncestorListener(object : AncestorListener {
+            override fun ancestorAdded(event: AncestorEvent) = refreshServiceAccountValidation()
+            override fun ancestorRemoved(event: AncestorEvent) = Unit
+            override fun ancestorMoved(event: AncestorEvent) = Unit
+        })
     }
 
     // =========================================================================
@@ -555,12 +562,14 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
                         else "ℹ️ Firebase App Distribution not detected"
                     )
                     logScrollPane.isVisible = true
+                    refreshServiceAccountValidation()
                 }
             } catch (e: Exception) {
                 ApplicationManager.getApplication().invokeLater {
                     statusLabel.text = "Scan failed"
                     appendLog("❌ Error scanning project: ${e.message}")
                     logScrollPane.isVisible = true
+                    refreshServiceAccountValidation()
                 }
             }
         }
@@ -810,8 +819,15 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
 
     private fun refreshServiceAccountValidation() {
         val path = saField.text.trim()
-        if (path.isBlank() || !File(path).isFile) {
+        if (path.isBlank()) {
             clearServiceAccountValidation()
+            return
+        }
+        if (!File(path).isFile) {
+            parsedAccount = null
+            saInfoLabel.icon = AllIcons.General.Warning
+            saInfoLabel.text = " File not found — select a valid service account JSON"
+            saInfoLabel.foreground = JBColor(Color(0xB36A00), Color(0xE0A030))
             return
         }
         tryParseServiceAccount(path)
