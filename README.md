@@ -5,6 +5,15 @@
 
 ---
 
+## What's New in v2.0.2 🔧
+
+| # | Change |
+|---|--------|
+| ✅ | **Service Account JSON validation fix** — Re-selecting a file (even at the same path after restoring a missing file) now updates validation correctly; clearing the path hides success/error icons |
+| 📦 | **JetBrains Marketplace publishing** — Plugin ZIP uses STORED compression; Android Studio–only module dependencies and explicit IDE version range (2025.1–2026.2) |
+
+---
+
 ## What's New in v2.0.1 🔧
 
 | # | Change |
@@ -83,7 +92,7 @@ cd FirebaseCoPilot
 
 The plugin ZIP will be at:
 ```
-build/distributions/FirebaseCoPilot-2.0.1.zip
+build/distributions/FirebaseCoPilot-2.0.2.zip
 ```
 
 **Install from ZIP:**

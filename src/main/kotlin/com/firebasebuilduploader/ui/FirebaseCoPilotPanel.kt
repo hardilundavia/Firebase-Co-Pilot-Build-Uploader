@@ -16,6 +16,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.SwingHelper
 import com.intellij.util.ui.UIUtil
 import kotlinx.coroutines.*
+import java.beans.PropertyChangeListener
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -583,7 +584,6 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     private fun restoreSettings() {
         if (settings.lastServiceAccountPath.isNotBlank()) {
             saField.text = settings.lastServiceAccountPath
-            tryParseServiceAccount(settings.lastServiceAccountPath)
         }
         if (settings.lastAppId.isNotBlank()) appIdField.text = settings.lastAppId
         rebuildTemplates()
@@ -601,10 +601,16 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
 
     private fun wireEvents() {
         saField.textField.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?)  = onSaPathChanged()
-            override fun removeUpdate(e: DocumentEvent?)  = onSaPathChanged()
+            override fun insertUpdate(e: DocumentEvent?)  = refreshServiceAccountValidation()
+            override fun removeUpdate(e: DocumentEvent?)  = refreshServiceAccountValidation()
             override fun changedUpdate(e: DocumentEvent?) = Unit
         })
+        saField.textField.addPropertyChangeListener("text", PropertyChangeListener {
+            refreshServiceAccountValidation()
+        })
+        // Fires after file-chooser selection even when the path string is unchanged.
+        saField.addActionListener { refreshServiceAccountValidation() }
+        refreshServiceAccountValidation()
         templateCombo.addActionListener {
             val sel = templateCombo.selectedItem as? String ?: return@addActionListener
             if (!sel.startsWith("—")) noteArea.text = sel
@@ -795,10 +801,20 @@ class FirebaseCoPilotPanel(private val project: Project) : JPanel(BorderLayout()
     // SA parsing
     // =========================================================================
 
-    private fun onSaPathChanged() {
+    private fun clearServiceAccountValidation() {
+        parsedAccount = null
+        saInfoLabel.icon = null
+        saInfoLabel.text = " "
+        saInfoLabel.foreground = JBColor.GRAY
+    }
+
+    private fun refreshServiceAccountValidation() {
         val path = saField.text.trim()
-        if (path.isNotBlank() && File(path).exists()) tryParseServiceAccount(path)
-        else { saInfoLabel.text = " "; saInfoLabel.foreground = JBColor.GRAY; parsedAccount = null }
+        if (path.isBlank() || !File(path).isFile) {
+            clearServiceAccountValidation()
+            return
+        }
+        tryParseServiceAccount(path)
     }
 
     private fun tryParseServiceAccount(path: String) {

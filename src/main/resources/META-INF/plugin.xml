@@ -66,12 +66,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <b>2.0.2</b> — JetBrains Marketplace publishing fix<br/>
+        <b>2.0.2</b> — Marketplace publishing &amp; validation fixes<br/>
         <ul>
+            <li><b>Fix: Service Account JSON validation</b> — Re-selecting a file (including the same path after the file is restored) now updates the validation label and icons correctly; clearing the path hides success/error icons.</li>
             <li><b>Fix: Plugin archive extraction</b> — Plugin ZIP is now built with STORED compression so JetBrains Marketplace can extract and verify the archive.</li>
             <li><b>Fix: Android Studio–only compatibility</b> — Declared <code>com.intellij.modules.androidstudio</code> and Gradle plugin dependencies so the plugin is verified for Android Studio, not plain IntelliJ IDEA.</li>
             <li><b>Fix: IDE version range</b> — Added explicit <code>since-build</code> / <code>until-build</code> for Android Studio 2025.1 through 2026.2.</li>
-            <li><b>No functional changes</b> — All build, deploy, and signing features behave the same as v2.0.1.</li>
         </ul>
 
         <b>2.0.1</b> — Platform compatibility &amp; security hardening<br/>
