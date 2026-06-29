@@ -2,7 +2,6 @@
     <id>com.firebasebuilduploader.android</id>
     <name>Firebase Co-Pilot Build Uploader</name>
     <vendor email="hardil.undavia@gmail.com">Hardil Undavia</vendor>
-    <version>2.0.1</version>
 
     <description><![CDATA[
         <b>Firebase Co-Pilot: Build Uploader</b> — The all-in-one Firebase App Distribution tool for Android developers.<br/><br/>
@@ -67,6 +66,14 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>2.0.2</b> — JetBrains Marketplace publishing fix<br/>
+        <ul>
+            <li><b>Fix: Plugin archive extraction</b> — Plugin ZIP is now built with STORED compression so JetBrains Marketplace can extract and verify the archive.</li>
+            <li><b>Fix: Android Studio–only compatibility</b> — Declared <code>com.intellij.modules.androidstudio</code> and Gradle plugin dependencies so the plugin is verified for Android Studio, not plain IntelliJ IDEA.</li>
+            <li><b>Fix: IDE version range</b> — Added explicit <code>since-build</code> / <code>until-build</code> for Android Studio 2025.1 through 2026.2.</li>
+            <li><b>No functional changes</b> — All build, deploy, and signing features behave the same as v2.0.1.</li>
+        </ul>
+
         <b>2.0.1</b> — Platform compatibility &amp; security hardening<br/>
         <ul>
             <li><b>Fix: JetBrains Marketplace compatibility warnings</b> — Migrated away from deprecated IntelliJ Platform APIs scheduled for removal in Android Studio 2025.x / 2026.x (file chooser, Gradle sync listener, and project refresh APIs).</li>
@@ -114,9 +121,10 @@
         </ul>
     ]]></change-notes>
 
-    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.androidstudio</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.android</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow

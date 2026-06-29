@@ -1,10 +1,13 @@
+import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.bundling.ZipEntryCompression
+
 plugins {
     kotlin("jvm") version "2.0.21"
     id("org.jetbrains.intellij.platform") version "2.7.2"
 }
 
 group = "io.firebasebuilduploader"
-version = "2.0.1"
+version = "2.0.2"
 
 repositories {
     mavenCentral()
@@ -53,4 +56,23 @@ kotlin {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+intellijPlatform {
+    buildSearchableOptions = false
+
+    pluginConfiguration {
+        id = "com.firebasebuilduploader.android"
+        name = "Firebase Co-Pilot Build Uploader"
+        version = project.version.toString()
+        ideaVersion {
+            sinceBuild = "251"
+            untilBuild = "262.*"
+        }
+    }
+}
+
+// Marketplace requires nested JARs to use STORED compression (not DEFLATE).
+tasks.withType<Zip>().configureEach {
+    entryCompression = ZipEntryCompression.STORED
 }
